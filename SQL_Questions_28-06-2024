@@ -1,0 +1,138 @@
+create database classwork
+
+use classwork;
+
+CREATE TABLE Departments(
+	DepartmentID int PRIMARY KEY,
+	Name nvarchar(255) NOT NULL,
+	Location nvarchar(255) NOT NULL
+	)
+GO
+
+CREATE TABLE Employees(
+	Number int IDENTITY(1,1) PRIMARY KEY,
+	Name nvarchar(255) NOT NULL,
+	Salary money NOT NULL ,
+	Commission money NOT NULL DEFAULT 0,
+	DateOfJoining date NOT NULL,
+	DateOfBirth date NOT NULL,
+	DepartmentNo int NOT NULL, --FOREIGN KEY(DepartmentNo) REFERENCES Department(ID), -- 1 way of defining FK
+	JobTitle nvarchar(255) NOT NULL,
+	ReportingTo int NULL,
+	 --CONSTRAINT PK__Employee PRIMARY KEY(Number),
+	 CONSTRAINT FK_Employee_Dept FOREIGN KEY(DepartmentNo) REFERENCES Departments(DepartmentID),
+	 CHECK (Salary>(0))
+	 )
+
+INSERT Departments (DepartmentID, Name, Location) VALUES (10, 'Sales', 'Pune'),
+(20, 'Engineering', 'Nagpur'),
+(30, 'Accounts', 'Pune'),
+(40, 'Customer Care', 'Mumbai')
+
+SET IDENTITY_INSERT Employees ON 
+
+INSERT Employees (Number, Name, Salary, Commission, DateOfJoining, DateOfBirth, DepartmentNo, JobTitle, ReportingTo) 
+	VALUES (2, 'Param', 3000, 20, '2017-12-12', '1995-01-01', 10, 'Salesman', NULL),
+			(3, 'Pratham', 3000, 10, '2017-12-23', '1995-01-17', 10, 'Analyst', 5),
+			(4, 'Akash', 2500, 5, '2017-12-12', '1995-01-03', 10, 'Salesman', 5),
+			(5, 'Meena', 2000, 4, '2017-02-12', '1995-01-06', 10, 'Manager', 14),
+			(6, 'Shweta', 2700, 3, '2017-12-04', '1995-06-01', 20, 'Tester', NULL),
+			(7, 'Tamanna', 3500, 7, '2017-12-06', '1995-03-01', 20, 'Developer', NULL),
+			(8, 'Rajesh', 2900, 10, '2017-12-03', '1995-01-07', 20, 'Developer', NULL),
+			(9, 'Geeta', 2000, 30, '2017-12-05', '1995-01-02', 30, 'Accountant', NULL),
+			(10, 'Sita', 1500, 20, '2017-07-12', '1995-09-01', 30, 'Cashier', NULL),
+			(11, 'Ram', 4000, 50, '2017-09-12', '1995-02-01', 30, 'Head', NULL),
+			(12, 'Amar', 2000, 30, '2017-12-05', '1995-01-02', 30, 'Accountant', NULL),
+			(13, 'Akshay', 1500, 20, '2017-07-12', '1995-09-01', 30, 'Cashier', NULL),
+			(14, 'Nandita', 4000, 50, '2017-09-12', '1995-02-01', 30, 'President', NULL),
+			(15, 'Sonal', 2000, 5, '2016-04-23', '1996-03-12', 10, 'Salesman', 5)
+
+SET IDENTITY_INSERT Employees OFF
+
+
+	 select * from Employees;
+	 Select * from Departments;
+
+	--1 List the employees belonging to the dept.10.
+	select  * from Employees  where DepartmentNo = 10; 
+
+	--2 List the name and salary of the employess whose salary is more than 1000.
+	select Name, Salary from Employees where Salary >1000;
+
+	--3 List the employess number and name of all managers
+	select Number, Name  from Employees where JobTitle = 'Manager';
+
+	--4 List the name of the developer working in dept 20.
+
+	select Name from Employees where JobTitle = 'Developer' and DepartmentNo = 20;
+	
+	--5 
+
+	--6 List he names of analytics and salesman.
+	select Name from Employees where JobTitle in ('Analyst', 'Salesman');
+
+	--7 List deatils of the employess who have joined before the end of septmeber 2017.
+	select * from Employees where DateOfJoining < '2017-09-30';
+
+	-- 8 List all the names of eployees who are not 'Managers
+	select name from  Employees where JobTitle <> 'Manager';
+
+	--9 List all column names of the 'Employee table
+		select * from sys.tables;
+		select * from sys.columns where object_id = 613577334
+
+	--10 List name,job titles, salary of all employee who were hired in 17-dec-2017
+	select Name, JobTitle, Salary from Employees where DateOfBirth = '2017-12-17'
+
+
+
+
+	--16  List the name if the employess whose employee id is amoong 3,6,8,9
+		select * from Employees where Number  in (3,6,8,9) ;
+
+	--17 List who do bot belong to dept. 30, 40 and 10
+
+	--18 List all the employee names and their salary whose salary falls with in the range of 1250 and 1600.
+	select Name, Salary from Employees where Salary  between  1250 and 1600; 
+
+	--19 List all the employee hired between 4-1-17 and 15-4-17
+		
+
+	--20 select the different job title available in emp table
+	select distinct(JobTitle) from Employees;
+
+
+
+	select * from Employees;
+	 Select * from Departments;
+
+	--21 List the name salary and of amount off the all employeee -- pf 10% of basic salary
+	select Name, Salary, Salary*0.1 as pf from Employees;
+
+	--subQuery questions
+
+	--22 List the name of employee drawing the highest salary
+	select * from Employees where Salary in (select Max(Salary) from Employees); 
+	select top 4 name from Employees  order by Salary desc;
+
+	--23 List the names of those who work in the same departmemnt as that of param. 
+	select * from Employees where DepartmentNo in ( select DepartmentNo from Employees where Name = 'Param');
+
+	--24 List employee having the same job as that of 'Akshay'.
+	select * from Employees where JobTitle = (select JobTitle from Employees where name  = 'Akshay');
+
+	--25 Find the name and hire date of the persaon who last employeed
+	select * from Employees where Number = (select Top 1 number from Employees order by Number desc);
+
+	--26 Issue a query to display the name and job of all employee in dept 2.0 who have a job that someone in the 
+	--	sales department has as well. 
+	select * from Employees as e inner join  Departments as d where (e.DepartmentNo = d.DepartmentID) and e.DepartmentNo = 20;
+	select * from Employees where DepartmentNo = 20 or DepartmentNo = (select DepartmentID from Departments where Name = 'Sales'); 
+	
+	--27 Find the information about employee who earn more than the employee in deopartment 20;
+	select * from Employees as e, Departments as d 
+	select * from Employees as e 
+
+
+
+
